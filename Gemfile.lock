@@ -1,0 +1,10 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    hub (1.10.4)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  hub

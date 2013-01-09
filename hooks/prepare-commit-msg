@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+
+require 'erb'
+require File.expand_path('../../config/change-request-log.rb', File.dirname(__FILE__))
+
+commit_msg_path = ARGV.shift
+commit_source = ARGV.shift
+
+all_submods = ChangeRequestLog.all_submods
+tmpl_path = File.expand_path('../../config/commit-message-template.erb', File.dirname(__FILE__))
+
+# Technically, this hook should handle an initial commit by comparing against
+# `git hash-object -t tree --stdin </dev/null` instead of HEAD if HEAD is not
+# a rev. But this isn't actually going to happen in practice.
+changed_paths = `git diff --cached --diff-filter=AM --name-only HEAD`.split("\n")
+
+submod_changes = {}
+other_changes = []
+
+changed_paths.each do |path|
+  if all_submods.include?(path)
+    # There should be a reliable way to get this using plumbing commands... I
+    # just can't think of it now.
+    summary = `git diff --cached --diff-filter=AM --submodule=short HEAD -- #{path}`
+    log = `git diff --cached --diff-filter=AM --submodule=log HEAD -- #{path}`
+    repo_url = `git config --get submodule.#{path}.url`.strip
+    old_rev = summary =~ /^-Subproject commit ([0-9a-f]+)$/ ? $1 : nil
+    new_rev = summary =~ /^\+Subproject commit ([0-9a-f]+)$/ ? $1 : nil
+    submod_changes[path] = {
+      :log => log,
+      :old_rev => old_rev,
+      :new_rev => new_rev,
+      :compare_url => ChangeRequestLog.compare_url(repo_url, old_rev, new_rev),
+      :suppressed => ChangeRequestLog.suppressed?(path),
+    }
+  else
+    # This is not currently used in the template
+    other_changes << path
+  end
+end
+
+template = ERB.new(File.read(tmpl_path), nil, '<>')
+
+orig_commit_msg = File.read(commit_msg_path).lstrip
+
+unless submod_changes.empty? or submod_changes.all? {|p, c| c[:suppressed] || c[:old_rev].nil? }
+  File.open(commit_msg_path, 'w') do |f|
+    f.write template.result(binding)
+  end
+end

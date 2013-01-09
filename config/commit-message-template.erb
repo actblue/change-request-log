@@ -1,0 +1,55 @@
+
+# One-line summary goes above. Use "[fixes org/repo#N]" if possible.
+#
+<%= orig_commit_msg %>
+
+<% submod_changes.each do |mod, change| %>
+Change to <%= mod %>
+====================
+
+<%= change[:log] %>
+
+Link: <%= change[:compare_url] %>
+<% unless change[:suppressed] %>
+
+Change Description
+------------------
+
+* What does this change do?
+
+* What resources are affected? (e.g. customer, application, environment)
+
+* What testing has been done?
+
+* What are the back-out procedures?
+
+Risk Assessment
+---------------
+
+* What are the risks? Is there a business impact?
+
+Security Assessment
+-------------------
+
+* Injection Flaws
+
+* Buffer overflows
+
+* Insecure Cryptographic Storage
+
+* Insecure Communications
+
+* Improper Error Handling
+
+* XSS
+
+* Improper Access Control
+
+* CSRF
+
+Documentation of Impact
+-----------------------
+
+* Testing performed after a change has been made, showing analysis
+<% end %>
+<% end %>
