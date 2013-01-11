@@ -43,10 +43,17 @@ end
 
 template = ERB.new(File.read(tmpl_path), nil, '<>')
 
-orig_commit_msg = File.read(commit_msg_path).lstrip
+orig_commit_msg = File.read(commit_msg_path)
 
-unless submod_changes.empty? or submod_changes.all? {|p, c| c[:suppressed] || c[:old_rev].nil? }
-  File.open(commit_msg_path, 'w') do |f|
-    f.write template.result(binding)
+unless submod_changes.empty? || submod_changes.all? {|p, c| c[:suppressed] || c[:old_rev].nil? }
+  # This is a bit of a hack; we need to behave sanely during rebases and not
+  # add the template to commit messages twice. Cheap heuristic for deciding if
+  # this is the case: if the first line is blank, assume it's a new commit,
+  # and if not, assume we're re-commiting a commit with an existing message.
+  if orig_commit_msg.start_with?("\n")
+    orig_commit_msg.lstrip!
+    File.open(commit_msg_path, 'w') do |f|
+      f.write template.result(binding)
+    end
   end
 end
