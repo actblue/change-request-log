@@ -87,3 +87,12 @@ parsable.
 
 I plan add a script that will generate a PDF from each commit, that could be
 run from another hook on a successful merge.
+
+License
+=======
+
+This repository framework is released under the MIT license (see the file
+`LICENSE` for details). Obviously, it is intended to be used to store private
+information. Please remember that the license, like all Free software
+licenses, says that you *may* redistribute derived works under certain
+conditions, not that you *must* do so.
