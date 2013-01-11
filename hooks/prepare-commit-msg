@@ -6,6 +6,8 @@ require File.expand_path('../../config/change-request-log.rb', File.dirname(__FI
 commit_msg_path = ARGV.shift
 commit_source = ARGV.shift
 
+exit(0) if commit_source == 'merge'
+
 all_submods = ChangeRequestLog.all_submods
 tmpl_path = File.expand_path('../../config/commit-message-template.erb', File.dirname(__FILE__))
 
