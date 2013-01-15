@@ -22,24 +22,21 @@ task :add, :url, :path do |t, args|
   sh 'git', 'commit'
 end
 
-namespace :update do
-
-  ChangeRequestLog.all_submods.each do |submod|
-    task submod do
-      pull_req_branch = "req-#{ENV['USER']}-#{Time.now.to_i}"
-      sh 'git', 'checkout', '-b', pull_req_branch
-      # Submodules tend to end up with a detached HEAD, so checkout before pulling
-      sh "cd #{submod} && git checkout master && git pull --rebase"
-      sh 'git', 'add', submod
-      unless `git status --porcelain #{submod}`.strip.empty?
-        sh 'git', 'commit'
-        sh 'git', 'checkout', 'master'
-        sh 'git', 'submodule', 'update'
-        sh 'git', 'push', 'origin', pull_req_branch
-        sh 'hub', 'pull-request', '-h', pull_req_branch
-      end
-    end
-
+desc "Update a submodule"
+task :update, :submod, :revision do |t, args|
+  orig_branch = `git symbolic-ref -q HEAD`.chomp.sub(%r[^refs/heads/], '')
+  pull_req_branch = "req-#{ENV['USER']}-#{Time.now.to_i}"
+  branch = args[:revision] || 'master'
+  submod = args[:submod]
+  sh 'git', 'checkout', '-b', pull_req_branch
+  # Submodules tend to end up with a detached HEAD, so checkout before pulling
+  sh "cd #{submod} && git checkout #{branch} && git pull --rebase"
+  sh 'git', 'add', submod
+  unless `git status --porcelain #{submod}`.strip.empty?
+    sh 'git', 'commit'
+    sh 'git', 'checkout', orig_branch
+    sh 'git', 'submodule', 'update'
+    sh 'git', 'push', 'origin', pull_req_branch
+    sh 'hub', 'pull-request', '-h', pull_req_branch
   end
-
 end

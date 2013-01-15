@@ -38,10 +38,10 @@ fork, add a submodule for each of your projects with:
 `PATH` is optional. To update an existing project and create a change request,
 run:
 
-    rake update[SUBMODULE]
+    rake update[SUBMODULE,REV]
 
-This does roughly the following behind the scenes, in case you need to do it
-yourself:
+`REV` defaults to `master`. This does roughly the following behind the
+scenes, in case you need to do it yourself:
 
     git checkout -b req-UNIQUENAME
     cd SUBMODULE
