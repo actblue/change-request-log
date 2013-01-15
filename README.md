@@ -22,6 +22,9 @@ message.
 How To Use This Repository
 ==========================
 
+(For everything below, bits of code in `ALL_CAPS` are placeholders for values
+that you should fill in.)
+
 Before doing anything, run:
 
     rake setup
