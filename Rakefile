@@ -37,6 +37,11 @@ task :update, :submod, :revision do |t, args|
     sh 'git', 'checkout', orig_branch
     sh 'git', 'submodule', 'update'
     sh 'git', 'push', 'origin', pull_req_branch
-    sh 'hub', 'pull-request', '-h', pull_req_branch
+    # We push to origin (normally, your org's shared private repo), so we must specify that for `hub pull-request`
+    if `git config --get remote.origin.url` =~ /^git@github.com:(.+?)\//
+      sh 'hub', 'pull-request', '-h', "#{$1}:#{pull_req_branch}"
+    else
+      puts "origin doesn't look like a GitHub repo, so skipping pull-request."
+    end
   end
 end
