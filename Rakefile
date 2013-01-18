@@ -26,11 +26,11 @@ desc "Update a submodule"
 task :update, :submod, :revision do |t, args|
   orig_branch = `git symbolic-ref -q HEAD`.chomp.sub(%r[^refs/heads/], '')
   pull_req_branch = "req-#{ENV['USER']}-#{Time.now.to_i}"
-  branch = args[:revision] || 'master'
+  ref = args[:revision] || 'master'
   submod = args[:submod]
   sh 'git', 'checkout', '-b', pull_req_branch
-  # Submodules tend to end up with a detached HEAD, so checkout before pulling
-  sh "cd #{submod} && git checkout #{branch} && git pull --rebase"
+  # Submodules tend to end up with a detached HEAD, so checkout first if we wanted a branch or tag
+  sh "cd #{submod} && if git symbolic-ref -q #{ref}; then git checkout #{ref} && git pull --rebase; else git fetch && git checkout #{ref}; fi"
   sh 'git', 'add', submod
   unless `git status --porcelain #{submod}`.strip.empty?
     sh 'git', 'commit'
