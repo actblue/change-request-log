@@ -57,6 +57,13 @@ It then uses `hub` to create a pull request (using a branch in the original
 repo, rather than a fork). If you have another merge workflow (e.g. email and
 `git am`), this could be made optional -- patches welcome!
 
+If you want to pass options to `git pull`, export the environment variable
+`PULL_OPTIONS`. For example,
+
+    export PULL_OPTIONS='--ff-only'
+
+would ensure you don't create any new merge commits inside the submodule.
+
 Non-PCI Projects (experimental)
 ===============================
 
