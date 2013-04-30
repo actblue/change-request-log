@@ -30,7 +30,7 @@ task :update, :submod, :revision do |t, args|
   submod = args[:submod]
   sh 'git', 'checkout', '-b', pull_req_branch
   # Submodules tend to end up with a detached HEAD, so checkout first if we wanted a branch or tag
-  sh "cd #{submod} && (git fetch; git checkout #{ref}; git symbolic-ref -q HEAD && git pull #{ENV['PULL_OPTIONS']})"
+  sh "cd #{submod} && (git fetch; git checkout #{ref}; if git symbolic-ref -q HEAD >/dev/null; then git pull #{ENV['PULL_OPTIONS']}; fi)"
   sh 'git', 'add', submod
   unless `git status --porcelain #{submod}`.strip.empty?
     sh 'git', 'commit'
