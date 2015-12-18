@@ -1,10 +1,13 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    hub (1.10.4)
+    hub (1.12.4)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   hub
+
+BUNDLED WITH
+   1.10.6
